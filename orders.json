@@ -1,0 +1,18 @@
+{
+    "orders": [
+        {
+            "item": "pupet1",
+            "quantity": 1,
+            "price": 100,
+            "buyer": "Petrov Ivan Ivanovich",
+            "date": "01.01.2020"
+        },
+        {
+            "item": "pupet2",
+            "quantity": 1,
+            "price": 100,
+            "buyer": "Petrov Ivan Ivanovich",
+            "date": "01.01.2020"
+        }
+    ]
+}
