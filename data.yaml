@@ -1,0 +1,9 @@
+key1:
+- item1
+- item2
+- item3
+key2: 50
+key3:
+  param1: 1ǿ
+  param2: 2ǿ
+  param3: 3ǿ
