@@ -1,9 +1,8 @@
 # Программа сервера для получения приветствия от клиента и отправки ответа
-import json
-import sys
-from socket import *
-import time
 import argparse
+import json
+import socket
+import sys
 
 
 def create_parser():
@@ -44,8 +43,9 @@ def sending_responde(client, result):
     client.send(result.encode('utf-8'))
     client.close()
 
+
 def receiver(addr, port):
-    s = socket(AF_INET, SOCK_STREAM)  # Создает сокет TCP
+    s = socket(socket.AF_INET, socket.SOCK_STREAM)  # Создает сокет TCP
     s.bind((addr, port))  # Присваивает порт 8888
     s.listen(5)  # Переходит в режим ожидания запросов;
     # Одновременно обслуживает не более

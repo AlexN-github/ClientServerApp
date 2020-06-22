@@ -1,9 +1,9 @@
 # Программа клиента, запрашивающего текущее время
-import json
-import time
-from socket import *
-import sys
 import argparse
+import json
+import socket
+import sys
+import time
 
 
 def create_parser():
@@ -13,15 +13,16 @@ def create_parser():
 
     return parser
 
+
 def execute_command_presence():
     print('Выполняем команду: `presence`')
     command = {
-        "action": "presence",
-        "time": int(time.time()),
-        "type": "status",
-        "user": {
-            "account_name": account_name,
-            "status": "Yep, I am here!"
+        'action': 'presence',
+        'time': int(time.time()),
+        'type': 'status',
+        'user': {
+            'account_name': account_name,
+            'status': 'Yep, I am here!'
         }
     }
     timestamp = int(time.time())
@@ -35,7 +36,7 @@ def execute_command_presence():
 def connect_to_server(addr, port):
     global sock
     print('Устанавливаем соединение:', (addr, port))
-    sock = socket(AF_INET, SOCK_STREAM)  # Создать сокет TCP
+    sock = socket(socket.AF_INET, socket.SOCK_STREAM)  # Создать сокет TCP
     sock.connect((addr, port))  # Соединиться с сервером
 
 
