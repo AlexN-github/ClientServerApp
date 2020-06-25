@@ -4,12 +4,13 @@ import json
 import socket
 import sys
 import time
+from common.variables import *
 
 
 def create_parser():
     parser = argparse.ArgumentParser()
     parser.add_argument('-a', '--addr')
-    parser.add_argument('-p', '--port', default='7777')
+    parser.add_argument('-p', '--port', default=str(default_port))
 
     return parser
 
@@ -49,7 +50,7 @@ def execute_command(command):
     msg_send = json.dumps(command)
     print(msg_send)
     sock.send(msg_send.encode('utf-8'))
-    data = sock.recv(1000000)
+    data = sock.recv(block_transfer_size)
     msg_recv = data.decode('utf-8')
     print('Сообщение от сервера: ', msg_recv, ', длиной ', len(msg_recv), ' байт')
     return msg_recv

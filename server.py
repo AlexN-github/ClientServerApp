@@ -3,12 +3,13 @@ import argparse
 import json
 import socket
 import sys
+from common.variables import *
 
 
 def create_parser():
     parser = argparse.ArgumentParser()
-    parser.add_argument('-a', '--addr', default='')
-    parser.add_argument('-p', '--port', default='7777')
+    parser.add_argument('-a', '--addr', default=str(server_addr_default))
+    parser.add_argument('-p', '--port', default=str(default_port))
 
     return parser
 
@@ -31,7 +32,7 @@ def processing_command(client, addr):
         else:
             pass
 
-    msg = client.recv(1000000).decode('utf-8')
+    msg = client.recv(block_transfer_size).decode('utf-8')
     print('Сообщение: ', msg, ', принято от клиента: ', addr)
     print('Разбираем запрос: {0}'.format(msg))
     command = parsing_command(msg)
