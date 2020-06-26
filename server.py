@@ -1,7 +1,7 @@
 # Программа сервера для получения приветствия от клиента и отправки ответа
 import argparse
 import json
-import socket
+from socket import *
 import sys
 from common.variables import *
 
@@ -15,7 +15,10 @@ def create_parser():
 
 
 def execute_command_presence(command):
-    return 'Команда обработана: {0}'.format(command)
+    result = {}
+    result['msg'] = 'command `{0}` completed successfully'.format(command['action'])
+    result['code'] = 200
+    return result
 
 
 def processing_command(client, addr):
@@ -26,11 +29,14 @@ def processing_command(client, addr):
     def execute_command(command):
         action = command['action']
         if action == 'presence':
-            return execute_command_presence(command)
+            result = execute_command_presence(command)
         elif action == '...':
             pass
         else:
-            pass
+            result = {}
+            result['msg'] = 'Invalid command'
+            result['code'] = 400
+        return result
 
     msg = client.recv(block_transfer_size).decode('utf-8')
     print('Сообщение: ', msg, ', принято от клиента: ', addr)
@@ -40,13 +46,14 @@ def processing_command(client, addr):
 
 
 def sending_responde(client, result):
-    print('Возвращаем клиенту {0} ответ: {1}'.format(client.getpeername(), result))
-    client.send(result.encode('utf-8'))
+    print('Возвращаем клиенту {0} msg: {1}; code: {2}'.format(client.getpeername(), result['msg'], result['code']))
+    msg_send = json.dumps(result)
+    client.send(msg_send.encode('utf-8'))
     client.close()
 
 
 def receiver(addr, port):
-    s = socket(socket.AF_INET, socket.SOCK_STREAM)  # Создает сокет TCP
+    s = socket(AF_INET, SOCK_STREAM)  # Создает сокет TCP
     s.bind((addr, port))  # Присваивает порт 8888
     s.listen(5)  # Переходит в режим ожидания запросов;
     # Одновременно обслуживает не более
@@ -54,8 +61,15 @@ def receiver(addr, port):
     print('Запуск сервера:', (addr, port))
     while True:
         client, addr = s.accept()
-        result = processing_command(client, addr)
-        sending_responde(client, result)
+        try:
+            result = processing_command(client, addr)
+            sending_responde(client, result)
+        except Exception:
+            result = {}
+            result['msg'] = 'Unexpected error'
+            result['code'] = 500
+            sending_responde(client, result)
+
 
 
 parser = create_parser()
