@@ -1,8 +1,11 @@
 # Программа сервера для получения приветствия от клиента и отправки ответа
+import logging
+import log.server_log_config
 import argparse
 import json
 from socket import *
 import sys
+
 from common.variables import *
 
 
@@ -39,14 +42,15 @@ def processing_command(client, addr):
         return result
 
     msg = client.recv(block_transfer_size).decode('utf-8')
-    print('Сообщение: ', msg, ', принято от клиента: ', addr)
-    print('Разбираем запрос: {0}'.format(msg))
     command = parsing_command(msg)
+    logger.debug('Принято сообщение: {0}, от клиента: {1}'.format(msg, addr))
+    logger.info('Принята команда: {0}'.format(command['action']))
     return execute_command(command)
 
 
 def sending_responde(client, result):
-    print('Возвращаем клиенту {0} msg: {1}; code: {2}'.format(client.getpeername(), result['msg'], result['code']))
+    logger.info('Возвращаем клиенту {0} msg: {1}; code: {2}'.format(client.getpeername(), result['msg'], result['code']))
+    # print('Возвращаем клиенту {0} msg: {1}; code: {2}'.format(client.getpeername(), result['msg'], result['code']))
     msg_send = json.dumps(result)
     client.send(msg_send.encode('utf-8'))
     client.close()
@@ -58,7 +62,8 @@ def receiver(addr, port):
     s.listen(5)  # Переходит в режим ожидания запросов;
     # Одновременно обслуживает не более
     # 5 запросов.
-    print('Запуск сервера:', (addr, port))
+    logger.info('Слушаем запросы от клиентов: {0}'.format((addr, port)))
+    # print('Запуск сервера:', (addr, port))
     while True:
         client, addr = s.accept()
         try:
@@ -69,12 +74,17 @@ def receiver(addr, port):
             result['msg'] = 'Unexpected error'
             result['code'] = 500
             sending_responde(client, result)
+            logger.error('Ошибка обработки запроса клиента {0}: {1}'.format(client, result['msg']))
 
 
+logger = logging.getLogger('app.server')
+logger.info('Программа сервер запущена')
 
-parser = create_parser()
-namespace = parser.parse_args(sys.argv[1:])
-addr = namespace.addr  # 'localhost'
-port = int(namespace.port)
-
-receiver(addr, port)
+try:
+    parser = create_parser()
+    namespace = parser.parse_args(sys.argv[1:])
+    addr = namespace.addr  # 'localhost'
+    port = int(namespace.port)
+    receiver(addr, port)
+except Exception as err:
+    logger.error(err)

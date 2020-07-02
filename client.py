@@ -1,10 +1,12 @@
 # Программа клиента, запрашивающего текущее время
+import log.client_log_config
 import argparse
 import json
 from socket import *
 import sys
 import time
 from common.variables import *
+import logging
 
 
 def create_parser():
@@ -16,7 +18,8 @@ def create_parser():
 
 
 def execute_command_presence():
-    print('Выполняем команду: `presence`')
+    logger.info('Выполняем команду: `presence`')
+    # print('Выполняем команду: `presence`')
     command = {
         'action': 'presence',
         'time': int(time.time()),
@@ -36,13 +39,15 @@ def execute_command_presence():
 
 def connect_to_server(addr, port):
     global sock
-    print('Устанавливаем соединение:', (addr, port))
+    logger.info('Устанавливаем соединение: {0}'.format((addr, port)))
+    # print('Устанавливаем соединение:', (addr, port))
     sock = socket(AF_INET, SOCK_STREAM)  # Создать сокет TCP
     sock.connect((addr, port))  # Соединиться с сервером
 
 
 def disconnect_from_server():
-    print('Отключаемся от сервера', (addr, port))
+    logger.info('Отключаемся от сервера {0}'.format((addr, port)))
+    # print('Отключаемся от сервера', (addr, port))
     sock.close()
 
 
@@ -57,17 +62,22 @@ def execute_command(msg):
     data = sock.recv(block_transfer_size)
     msg_recv = data.decode('utf-8')
     result = parsing_recv(msg_recv)
-    print('Сообщение от сервера: {0}; Code: {1}'.format(result['msg'], result['code']))
+    logger.info('Сообщение от сервера: {0}; Code: {1}'.format(result['msg'], result['code']))
+    # print('Сообщение от сервера: {0}; Code: {1}'.format(result['msg'], result['code']))
     return result
 
 
+logger = logging.getLogger('app.client')
+logger.info('Программа клиент запущена')
 parser = create_parser()
 namespace = parser.parse_args(sys.argv[1:])
 addr = namespace.addr  # 'localhost'
 port = int(namespace.port)
 account_name = 'Alex'
 
-
-connect_to_server(addr=addr, port=port)
-execute_command_presence()
-disconnect_from_server()
+try:
+    connect_to_server(addr=addr, port=port)
+    execute_command_presence()
+    disconnect_from_server()
+except Exception as err:
+    logger.error(err)
