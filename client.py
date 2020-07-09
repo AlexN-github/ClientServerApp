@@ -33,7 +33,41 @@ def execute_command_presence():
     command['time'] = timestamp
     command['account_name'] = 'Alex'
     result = execute_command(command)
+    print(result)
 
+    return result
+
+def execute_command_broadcast():
+    logger.info('Выполняем команду: `broadcast`')
+    # print('Выполняем команду: `broadcast`')
+    command = {
+        'action': 'broadcast',
+        'time': int(time.time()),
+        'type': 'status',
+        'user': {
+            'account_name': account_name,
+            'status': 'Yep, I am here!'
+        }
+    }
+    timestamp = int(time.time())
+    command['time'] = timestamp
+    command['account_name'] = 'Alex'
+    result = execute_command(command)
+    print(result)
+
+    return result
+
+
+def waiting_messages():
+    def parsing_recv(msg):
+        respond = json.loads(msg)
+        return respond
+
+    data = sock.recv(block_transfer_size)
+    msg_recv = data.decode('utf-8')
+    result = parsing_recv(msg_recv)
+    logger.info('Сообщение от сервера: {0}; Code: {1}'.format(result['msg'], result['code']))
+    # print('Сообщение от сервера: {0}; Code: {1}'.format(result['msg'], result['code']))
     return result
 
 
@@ -77,7 +111,17 @@ account_name = 'Alex'
 
 try:
     connect_to_server(addr=addr, port=port)
-    execute_command_presence()
-    disconnect_from_server()
+    while True:
+        inputuser = input('Отправить клиенту команду PRESENCE (1) \r\nОтправить клиенту команду BROADCAST (2) \r\nЖдем входящие сообшения (3) \r\nОтключиться от сервера и выйти (q)')
+        if inputuser == '1':
+            execute_command_presence()
+        if inputuser == '2':
+            execute_command_broadcast()
+        if inputuser == '3':
+            waiting_messages()
+        elif inputuser == 'q':
+            break
+
+    #disconnect_from_server()
 except Exception as err:
     logger.error(err)
