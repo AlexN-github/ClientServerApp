@@ -76,7 +76,7 @@ def sending_responde_brodcaste(client, result):
     # print('Возвращаем клиенту {0} msg: {1}; code: {2}'.format(client.getpeername(), result['msg'], result['code']))
     msg_send = json.dumps(result)
     for cli in clients:
-        request_queue[cli].send(msg_send.encode('utf-8'))
+        cli.send(msg_send.encode('utf-8'))
     #client.close()
 
 

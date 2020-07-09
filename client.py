@@ -67,7 +67,8 @@ def waiting_messages():
     msg_recv = data.decode('utf-8')
     result = parsing_recv(msg_recv)
     logger.info('Сообщение от сервера: {0}; Code: {1}'.format(result['msg'], result['code']))
-    # print('Сообщение от сервера: {0}; Code: {1}'.format(result['msg'], result['code']))
+    print(result)
+    #print('Сообщение от сервера: {0}; Code: {1}'.format(result['msg'], result['code']))
     return result
 
 
@@ -112,6 +113,7 @@ account_name = 'Alex'
 try:
     connect_to_server(addr=addr, port=port)
     while True:
+        print('*'*30)
         inputuser = input('Отправить клиенту команду PRESENCE (1) \r\nОтправить клиенту команду BROADCAST (2) \r\nЖдем входящие сообшения (3) \r\nОтключиться от сервера и выйти (q)')
         if inputuser == '1':
             execute_command_presence()
